@@ -1,7 +1,4 @@
-// ./data/migrations/timestamp_bootstrap.js
 exports.up = function(knex, Promise) {
-  // the tables must be created in the right order,
-  // tables with FKs are created after the referenced table is
   return knex.schema
     .createTable("dishes", tbl => {
       tbl.increments();
@@ -9,6 +6,7 @@ exports.up = function(knex, Promise) {
         .string("name", 128)
         .notNullable()
         .unique();
+      tbl.timestamps(true, true);
     })
     .createTable("recipes", tbl => {
       tbl.increments();
@@ -21,27 +19,30 @@ exports.up = function(knex, Promise) {
         .unsigned()
         .references("id")
         .inTable("dishes")
-        .onDelete("RESTRICT")
+        .onDelete("CASCADE")
         .onUpdate("CASCADE");
+      tbl.timestamps(true, true);
     })
     .createTable("ingredients", tbl => {
       tbl.increments();
       tbl.string("name", 128).notNullable();
+      tbl.timestamps(true, true);
     })
     .createTable("recipe_ingredients", tbl => {
       tbl.increments();
       tbl
-        .integer("dish_id")
+        .integer("recipe_id")
         .unsigned()
         .references("id")
-        .inTable("dishes")
-        .onDelete("RESTRICT")
+        .inTable("recipes")
+        .onDelete("CASCADE")
         .onUpdate("CASCADE");
       tbl
         .integer("ingredients_id")
         .unsigned()
         .references("id")
-        .onDelete("RESTRICT")
+        .inTable("ingredients")
+        .onDelete("CASCADE")
         .onUpdate("CASCADE");
     });
 };
